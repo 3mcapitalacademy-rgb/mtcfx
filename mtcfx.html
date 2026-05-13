@@ -1,0 +1,815 @@
+﻿<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTCFX - 會員群組戰績</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #00c08b;
+            --primary-dark: #00a574;
+            --positive: #00c08b;
+            --negative: #f44336;
+            --bg-dark: #191c22;
+            --bg-card: #232830;
+            --bg-input: #2a303b;
+            --text-primary: #ffffff;
+            --text-secondary: #8b929e;
+            --border: #343a45;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'eToro', 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        
+        /* Profile Header */
+        .profile-header {
+            background: linear-gradient(135deg, #232830 0%, #191c22 100%);
+            padding: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .header-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            gap: 25px;
+            align-items: flex-start;
+        }
+        
+        .avatar-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #191c22;
+            border: 3px solid var(--bg-card);
+        }
+        
+        .verified-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: var(--primary);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border: 2px solid var(--bg-dark);
+        }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .profile-name-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .profile-name {
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+        
+        .profile-username {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+        
+        .profile-bio {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            max-width: 500px;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .profile-stat {
+            text-align: center;
+        }
+        
+        .profile-stat-value {
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+        
+        .profile-stat-value.positive { color: var(--positive); }
+        .profile-stat-value.negative { color: var(--negative); }
+        
+        .profile-stat-label {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+        }
+        
+        .profile-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: #363c4a;
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .content-left {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Performance Chart */
+        .chart-container {
+            height: 250px;
+        }
+        
+        /* Year Cards */
+        .year-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .year-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .year-title {
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        .year-total {
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+        
+        .year-total.positive { color: var(--positive); }
+        .year-total.negative { color: var(--negative); }
+        
+        .year-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .year-stat {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .year-stat-value {
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        .year-stat-value.positive { color: var(--positive); }
+        .year-stat-value.negative { color: var(--negative); }
+        
+        .year-stat-label {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+        }
+        
+        /* Mini Bars */
+        .mini-bars {
+            display: flex;
+            gap: 4px;
+            height: 50px;
+            align-items: flex-end;
+        }
+        
+        .mini-bar {
+            flex: 1;
+            border-radius: 2px 2px 0 0;
+            min-width: 14px;
+            cursor: pointer;
+            position: relative;
+            transition: opacity 0.2s;
+        }
+        
+        .mini-bar.positive { background: var(--positive); }
+        .mini-bar.negative { background: var(--negative); }
+        
+        .mini-bar:hover {
+            opacity: 0.8;
+        }
+        
+        .mini-bar .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0d0f13;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 10;
+            border: 1px solid var(--border);
+            margin-bottom: 5px;
+        }
+        
+        .mini-bar:hover .tooltip {
+            opacity: 1;
+        }
+        
+        /* Summary Table */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .summary-table th,
+        .summary-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .summary-table th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.85em;
+        }
+        
+        .summary-table td {
+            font-size: 0.9em;
+        }
+        
+        .summary-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        /* Pricing Card */
+        .pricing-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .pricing-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .pricing-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .pricing-option {
+            background: var(--bg-input);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .pricing-option:hover {
+            border-color: var(--primary);
+        }
+        
+        .pricing-option.featured {
+            border-color: var(--primary);
+            background: rgba(0, 192, 139, 0.1);
+        }
+        
+        .pricing-period {
+            font-size: 0.95em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .pricing-amount {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--positive);
+        }
+        
+        .pricing-savings {
+            font-size: 0.8em;
+            color: #ffd700;
+            margin-top: 3px;
+        }
+        
+        .pricing-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .pricing-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Info List */
+        .info-list {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9em;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: var(--text-secondary);
+        }
+        
+        .info-value {
+            font-weight: 500;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: var(--text-secondary);
+            font-size: 0.75em;
+            border-top: 1px solid var(--border);
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header-content {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .profile-stats {
+                justify-content: center;
+            }
+            
+            .profile-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .year-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .profile-stat {
+                min-width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="header-content">
+            <div class="avatar-wrapper">
+                <img src="logo.jpg" alt="MTCFX" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--bg-card);">
+                <div class="verified-badge">✓</div>
+            </div>
+            
+            <div class="profile-info">
+                <div class="profile-name-row">
+                    <span class="profile-name">MTCFX</span>
+                </div>
+                <div class="profile-username">@MTCFX</div>
+                <div class="profile-bio">
+                    專業量化交易團隊 | 17個月實盤驗證 | 每日3單策略訊號
+                    <br><span style="color: #8b929e; font-size: 0.85em;">適合上班族的投資選擇 · 嚴格風控</span>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="profile-stat-value positive">+$85,457</div>
+                        <div class="profile-stat-label">總盈利</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value positive">+855%</div>
+                        <div class="profile-stat-label">總回報</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">82%</div>
+                        <div class="profile-stat-label">月度勝率</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">17</div>
+                        <div class="profile-stat-label">個月</div>
+                    </div>
+                </div>
+                
+                <div class="profile-actions">
+                    <a href="https://t.me/Paul_3mfx" class="btn btn-primary" target="_blank"><img src="emoji-telegram2.jpg" alt="Telegram" style="height:20px;vertical-align:middle;margin-right:8px;mix-blend-mode: multiply;">立即加入 Telegram</a>
+                    <a href="https://line.me/ti/p/xxu7P8DrxG" class="btn btn-primary" target="_blank"><img src="emoji-Line.jpg" alt="LINE" style="height:20px;vertical-align:middle;margin-right:8px;">立即加入 LINE</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-left">
+            <!-- Performance Chart -->
+            <div class="card">
+                <div class="card-title">📈 表現</div>
+                <div class="chart-container">
+                    <canvas id="perfChart"></canvas>
+                </div>
+            </div>
+            
+
+            
+            <!-- 2024 -->
+            <div class="year-section">
+                <div class="year-header">
+                    <span class="year-title">📅 2024年 (運營1個月)</span>
+                    <span class="year-total positive">+$8,200</span>
+                </div>
+                <div class="year-stats">
+                    <div class="year-stat">
+                        <div class="year-stat-value positive">1</div>
+                        <div class="year-stat-label">盈利月</div>
+                    </div>
+                    <div class="year-stat">
+                        <div class="year-stat-value">0</div>
+                        <div class="year-stat-label">虧損月</div>
+                    </div>
+                    <div class="year-stat">
+                        <div class="year-stat-value positive">100%</div>
+                        <div class="year-stat-label">勝率</div>
+                    </div>
+                    <div class="year-stat">
+                        <div class="year-stat-value">起始階段</div>
+                        <div class="year-stat-label">評價</div>
+                    </div>
+                </div>
+                <div class="mini-bars">
+                    <div class="mini-bar positive" style="height: 100%"><span class="tooltip">12月 +$8,200</span></div>
+                </div>
+            </div>
+            
+            <!-- 2025 -->
+            <div class="year-section">
+                <div class="year-header">
+                    <span class="year-title">📅 2025年 (運營12個月)</span>
+                    <span class="year-total positive">+$57,756</span>
+                </div>
+                <div class="year-stats">
+                    <div class="year-stat">
+                        <div class="year-stat-value positive">11</div>
+                        <div class="year-stat-label">盈利月</div>
+                    </div>
+                    <div class="year-stat">
+                        <div class="year-stat-value negative">1</div>
+                        <div class="year-stat-label">虧損月</div>
+                    </div>
+                    <div class="year-stat">
+                        <div class="year-stat-value">92%</div>
+                        <div class="year-stat-label">勝率</div>
+                    </div>
+                    <div class="year-stat">
+                        <div class="year-stat-value positive">穩定盈利</div>
+                        <div class="year-stat-label">評價</div>
+                    </div>
+                </div>
+                <div class="mini-bars">
+                    <div class="mini-bar negative" style="height: 5%"><span class="tooltip">1月 -$630</span></div>
+                    <div class="mini-bar positive" style="height: 100%"><span class="tooltip">2月 +$8,330</span></div>
+                    <div class="mini-bar positive" style="height: 26%"><span class="tooltip">3月 +$2,205</span></div>
+                    <div class="mini-bar positive" style="height: 57%"><span class="tooltip">4月 +$4,745</span></div>
+                    <div class="mini-bar positive" style="height: 45%"><span class="tooltip">5月 +$3,747</span></div>
+                    <div class="mini-bar positive" style="height: 77%"><span class="tooltip">6月 +$6,395</span></div>
+                    <div class="mini-bar positive" style="height: 53%"><span class="tooltip">7月 +$4,444</span></div>
+                    <div class="mini-bar positive" style="height: 37%"><span class="tooltip">8月 +$3,060</span></div>
+                    <div class="mini-bar positive" style="height: 48%"><span class="tooltip">9月 +$3,980</span></div>
+                    <div class="mini-bar positive" style="height: 100%"><span class="tooltip">10月 +$13,840</span></div>
+                    <div class="mini-bar positive" style="height: 29%"><span class="tooltip">11月 +$2,410</span></div>
+                    <div class="mini-bar positive" style="height: 68%"><span class="tooltip">12月 +$5,630</span></div>
+                </div>
+            </div>
+            
+            <!-- 2026 -->
+            <div class="year-section">
+                <div class="year-header">
+                    <span class="year-title">📅 2026年 (運營4個月)</span>
+                    <span class="year-total positive">+$19,501</span>
+                </div>
+                <div class="year-stats">
+                    <div class="year-stat">
+                        <div class="year-stat-value positive">2</div>
+                        <div class="year-stat-label">盈利月</div>
+                    </div>
+                    <div class="year-stat">
+                        <div class="year-stat-value negative">2</div>
+                        <div class="year-stat-label">虧損月</div>
+                    </div>
+                    <div class="year-stat">
+                        <div class="year-stat-value">50%</div>
+                        <div class="year-stat-label">勝率</div>
+                    </div>
+                    <div class="year-stat">
+                        <div class="year-stat-value">待觀察</div>
+                        <div class="year-stat-label">評價</div>
+                    </div>
+                </div>
+                <div class="mini-bars">
+                    <div class="mini-bar negative" style="height: 2%"><span class="tooltip">1月 -$268</span></div>
+                    <div class="mini-bar negative" style="height: 13%"><span class="tooltip">2月 -$2,167</span></div>
+                    <div class="mini-bar positive" style="height: 27%"><span class="tooltip">3月 +$4,727</span></div>
+                    <div class="mini-bar positive" style="height: 100%"><span class="tooltip">4月 +$17,209</span></div>
+                </div>
+            </div>
+            
+            <!-- Summary Table -->
+            <div class="card">
+                <div class="card-title">📋 三年綜合概覽</div>
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>年度</th>
+                            <th>運營月數</th>
+                            <th>總盈利</th>
+                            <th>勝率</th>
+                            <th>備注</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2024</td>
+                            <td>1個月</td>
+                            <td style="color: var(--positive)">+$8,200</td>
+                            <td>100%</td>
+                            <td>起始階段</td>
+                        </tr>
+                        <tr>
+                            <td>2025</td>
+                            <td>12個月</td>
+                            <td style="color: var(--positive)">+$57,756</td>
+                            <td>92%</td>
+                            <td>穩定盈利</td>
+                        </tr>
+                        <tr>
+                            <td>2026</td>
+                            <td>4個月</td>
+                            <td style="color: var(--positive)">+$19,501</td>
+                            <td>50%</td>
+                            <td>待觀察</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Pricing -->
+            <div class="pricing-card">
+                <div class="pricing-title">💰 會員群組收費</div>
+                <div class="pricing-options">
+                    <div class="pricing-option">
+                        <div class="pricing-period">3個月</div>
+                        <div class="pricing-amount">388 USDT</div>
+                    </div>
+                    <div class="pricing-option featured">
+                        <div class="pricing-period">6個月</div>
+                        <div class="pricing-amount">688 USDT</div>
+                        <div class="pricing-saves">🔥 省 $40</div>
+                    </div>
+                    <div class="pricing-option">
+                        <div class="pricing-period">12個月</div>
+                        <div class="pricing-amount">998 USDT</div>
+                        <div class="pricing-saves">🎯 省 $658</div>
+                    </div>
+                </div>
+                <div class="cta-buttons" style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="https://t.me/Paul_3mfx" class="pricing-btn" target="_blank"><img src="emoji-telegram2.jpg" alt="Telegram" style="height:18px;vertical-align:middle;margin-right:8px;mix-blend-mode: multiply;">立即加入 Telegram</a>
+                    <a href="https://line.me/ti/p/xxu7P8DrxG" class="pricing-btn" target="_blank"><img src="emoji-Line.jpg" alt="LINE" style="height:18px;vertical-align:middle;margin-right:8px;">立即加入 LINE</a>
+                </div>
+            </div>
+            
+            <!-- Info -->
+            <div class="info-list">
+                <div class="card-title">ℹ️ 基本資訊</div>
+                <div class="info-item">
+                    <span class="info-label">成立日期</span>
+                    <span class="info-value">2024年12月</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">服務類型</span>
+                    <span class="info-value">每日策略訊號</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">策略數量</span>
+                    <span class="info-value">每日3單</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">適合對象</span>
+                    <span class="info-value">上班族/投資者</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>⚠️ 投資有風險，過往表現不代表未來收益</p>
+        <p>資料來源：MTCFX · 更新：2026年5月5日</p>
+    </div>
+
+    <script>
+        // Data
+        const data = [8200,-630,8330,2205,4745,3747,6395,4444,3060,3980,13840,2410,5630,-268,-2167,4727,17209];
+        const labels = ['24/12','25/1','2','3','4','5','6','7','8','9','10','11','12','26/1','2','3','4'];
+        
+        let cum = 10000, cumData = [cum];
+        data.forEach(v => { cum += v; cumData.push(cum); });
+        
+        const colors = data.map(v => v >= 0 ? '#00c08b' : '#f44336');
+        
+        new Chart(document.getElementById('perfChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        type: 'line',
+                        label: '累計',
+                        data: cumData,
+                        borderColor: '#00c08b',
+                        backgroundColor: 'rgba(0,192,139,0.1)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0,
+                        yAxisID: 'y1'
+                    },
+                    {
+                        type: 'bar',
+                        label: '月度',
+                        data: data,
+                        backgroundColor: colors,
+                        borderRadius: 2,
+                        yAxisID: 'y'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0d0f13',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        callbacks: {
+                            label: c => (c.dataset.type === 'line' ? '累計: $' : '$') + c.parsed.y.toLocaleString()
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#8b929e', maxRotation: 45, font: { size: 9 } }
+                    },
+                    y: {
+                        position: 'left',
+                        grid: { color: 'rgba(255,255,255,0.03)' },
+                        ticks: { color: '#8b929e', callback: v => '$' + (v/1000) + 'K', font: { size: 9 } }
+                    },
+                    y1: {
+                        position: 'right',
+                        grid: { display: false },
+                        ticks: { color: '#00c08b', callback: v => '$' + (v/1000) + 'K', font: { size: 9 } }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

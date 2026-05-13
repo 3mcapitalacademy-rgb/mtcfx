@@ -1,0 +1,2073 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTCFX | 量化交易專家</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a1628;
+            --secondary: #E8F5E9;
+            --accent: #0066cc;
+            --accent-glow: rgba(0, 102, 204, 0.3);
+            --text-light: #ffffff;
+            --text-dark: #1a1a2e;
+            --text-gray: #666680;
+            --glass: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', 'Space Grotesk', sans-serif;
+            background: var(--secondary);
+            color: var(--text-dark);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(0, 102, 204, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(10, 22, 40, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(0, 102, 204, 0.05) 0%, transparent 70%);
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite;
+        }
+
+        .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 20%; top: 80%; animation-delay: 2s; }
+        .particle:nth-child(3) { left: 60%; top: 10%; animation-delay: 4s; }
+        .particle:nth-child(4) { left: 80%; top: 60%; animation-delay: 6s; }
+        .particle:nth-child(5) { left: 40%; top: 40%; animation-delay: 8s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+            50% { transform: translateY(-100px) scale(1.5); opacity: 0.6; }
+        }
+
+        /* Hero橫幅廣告*/
+        .promo-hero-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .promo-hero-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 24px 30px;
+            background: linear-gradient(135deg, #1a2a3a 0%, #0d1520 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 102, 204, 0.4);
+            box-shadow: 0 8px 30px rgba(0, 102, 204, 0.2);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .promo-hero-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 40px rgba(0, 102, 204, 0.3);
+            border-color: rgba(0, 192, 139, 0.6);
+        }
+
+        .promo-hero-icon {
+            font-size: 2.5em;
+            flex-shrink: 0;
+        }
+
+        .promo-hero-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .promo-hero-title {
+            color: #00c08b;
+            font-weight: 700;
+            font-size: 1.2em;
+            margin-bottom: 4px;
+        }
+
+        .promo-hero-desc {
+            color: #a0aab4;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 600px) {
+            .promo-hero-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .promo-hero-card {
+                flex-direction: column;
+                padding: 20px;
+                text-align: center;
+                min-width: auto;
+            }
+            .promo-hero-text {
+                text-align: center;
+            }
+            .promo-hero-icon {
+                font-size: 2em;
+            }
+            .promo-hero-title {
+                font-size: 1.1em;
+            }
+            .promo-hero-desc {
+                font-size: 0.85em;
+            }
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 22, 40, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.3s;
+        }
+
+        nav.scrolled {
+            padding: 1rem 5%;
+            background: rgba(10, 22, 40, 0.95);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo img {
+            height: 45px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #ffffff;
+        }
+
+        .logo-text-wrapper {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .logo-subtext {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #ffffff;
+            margin-top: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-login, .nav-register {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .nav-login {
+            background: var(--accent);
+            color: white !important;
+        }
+
+        .nav-login:hover {
+            background: #0052a3;
+        }
+
+        .nav-register {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent) !important;
+        }
+
+        .nav-register:hover {
+            background: var(--accent);
+            color: white !important;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 5% 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 0.6rem 1.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            letter-spacing: 3px;
+            font-weight: 600;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 7vw, 5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.15;
+        }
+
+        .hero h1 .highlight {
+            background: var(--accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-gray);
+            margin-bottom: 3rem;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #c9a227 100%);
+            color: var(--primary);
+            border: none;
+            box-shadow: 0 4px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 40px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        /* Hero section large button */
+        .hero .btn-primary {
+            padding: 1.5rem 4rem;
+            font-size: 1.3rem;
+            min-width: 400px;
+        }
+
+        .btn-outline {
+            background: var(--primary);
+            color: var(--text-light);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(0, 102, 204, 0.1);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 100px 5%;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-label {
+            color: var(--accent);
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            margin-bottom: 1rem;
+            display: block;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Strategy Section */
+        .strategy {
+            background: linear-gradient(180deg, transparent 0%, rgba(15, 34, 64, 0.5) 100%);
+        }
+
+        .strategy-image {
+            max-width: 1100px;
+            margin: 0 auto 4rem;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+        }
+
+        .strategy-image img {
+            width: 100%;
+            display: block;
+        }
+
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .strategy-intro {
+            text-align: left;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            padding: 1.5rem 2rem;
+            background: rgba(0, 102, 204, 0.05);
+            border-radius: 12px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .strategy-intro p {
+            color: var(--text-dark);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .strategy-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s;
+        }
+
+        .strategy-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s;
+        }
+
+        .strategy-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .strategy-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .strategy-number {
+            font-size: 4rem;
+            font-weight: 700;
+            color: rgba(212, 175, 55, 0.15);
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            line-height: 1;
+        }
+
+        .strategy-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .strategy-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-dark);
+        }
+
+        .strategy-card p {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+        }
+
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 2rem;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            transition: all 0.4s;
+            position: relative;
+        }
+
+        .service-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-12px);
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-card:hover::after {
+            width: 100px;
+        }
+
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--accent) 0%, #b8942d 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.3);
+        }
+
+        .service-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .service-card p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+
+        /* Pricing Section */
+        .pricing-section {
+            padding: 6rem 5%;
+            background: linear-gradient(180deg, transparent 0%, rgba(15, 34, 64, 0.3) 50%, transparent 100%);
+        }
+
+        .pricing-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .signal-times {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .signal-times h3 {
+            font-size: 1.4rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .time-grid {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .time-item {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .time-label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .time-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .lot-size {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        .pricing-plans {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .pricing-plans h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .plans-grid {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem 2.5rem;
+            border-radius: 16px;
+            text-align: center;
+            min-width: 160px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.2);
+        }
+
+        .plan-card.featured {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(15, 34, 64, 0.8) 100%);
+            border-color: var(--accent);
+        }
+
+        .plan-period {
+            display: block;
+            font-size: 1rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-price {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: var(--accent);
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        .payment-method {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        .benefits {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 1.5rem;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .benefits h3 {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .social-platforms {
+            text-align: center;
+        }
+
+        .social-platforms h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .platforms {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .platform {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .platform-icon {
+            color: var(--accent);
+        }
+
+        .platform-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .platform-features li {
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .cta-text {
+            font-size: 1.1rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Profit Sharing Section */
+        .profit-sharing {
+            padding: 6rem 5%;
+            background: linear-gradient(180deg, transparent 0%, rgba(15, 34, 64, 0.3) 50%, transparent 100%);
+        }
+
+        .ps-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .ps-highlight, .ps-schedule, .ps-risk, .ps-diversity, .ps-flexibility {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+        }
+
+        .ps-highlight h3, .ps-schedule h3, .ps-risk h3, .ps-groups h3, .ps-diversity h3, .ps-flexibility h3, .ps-flow h3 {
+            font-size: 1.3rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .ps-highlight p, .ps-risk p, .ps-diversity p, .ps-flexibility p {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        .ps-schedule {
+            background: transparent;
+            border: none;
+            padding: 0;
+        }
+
+        .ps-groups {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .groups-note {
+            color: var(--text-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .groups-grid {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .group-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            text-align: center;
+            min-width: 140px;
+            transition: all 0.3s;
+        }
+
+        .group-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .group-card.featured {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(15, 34, 64, 0.8) 100%);
+            border-color: var(--accent);
+        }
+
+        .group-icon {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .group-name {
+            display: block;
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .group-lots {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .ps-flow {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .flow-steps {
+            list-style: none;
+            text-align: left;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .flow-steps li {
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: var(--glass);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: var(--primary);
+            border-radius: 50%;
+            font-weight: 700;
+            margin-right: 0.8rem;
+        }
+
+        .flow-link {
+            color: var(--accent);
+            word-break: break-all;
+        }
+
+        .flow-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Team Section */
+        .team {
+            background: linear-gradient(180deg, rgba(15, 34, 64, 0.5) 0%, transparent 100%);
+        }
+
+        .team-image {
+            max-width: 1200px;
+            margin: 0 auto;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+        }
+
+        .team-image img {
+            width: 100%;
+            display: block;
+            transition: transform 0.5s;
+        }
+
+        .team-image:hover img {
+            transform: scale(1.02);
+        }
+
+        /* Elite Features */
+        .elite-features {
+            max-width: 900px;
+            margin: 0 auto 3rem;
+            padding: 2rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+        }
+
+        .elite-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .elite-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .elite-icon {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .elite-label {
+            display: block;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .elite-value {
+            display: block;
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .elite-performance {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(15, 34, 64, 0.5) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .performance-label {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        .performance-value {
+            color: var(--accent);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+        }
+
+        /* Risk Section */
+        .risk-section {
+            background: var(--secondary);
+        }
+
+        .risk-image {
+            max-width: 1000px;
+            margin: 0 auto 4rem;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+        }
+
+        .risk-image img {
+            width: 100%;
+            display: block;
+        }
+
+        .risk-table {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--glass);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .risk-header {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+            padding: 1.5rem 2rem;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .risk-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--glass-border);
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .risk-row:last-child {
+            border-bottom: none;
+        }
+
+        .risk-row:hover {
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .risk-group {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            justify-content: center;
+        }
+
+        .risk-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .risk-conservative .risk-icon {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .risk-standard .risk-icon {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .risk-aggressive .risk-icon {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fb923c;
+        }
+
+        .lot-size {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .risk-warning {
+            text-align: center;
+            color: var(--accent);
+            margin-top: 2rem;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        /* CTA Section */
+        .cta {
+            text-align: center;
+            padding: 120px 5%;
+            position: relative;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 100px 5%;
+            background: var(--glass);
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            margin-top: 3rem;
+        }
+
+        .faq-item {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .faq-item h3 {
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .faq-item p {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        /* Social Section */
+        .social-section {
+            padding: 80px 5%;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--primary);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .social-link:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px var(--accent-glow);
+        }
+
+        .social-link.telegram:hover {
+            border-color: #0088cc;
+        }
+
+        .social-link.line:hover {
+            border-color: #06c755;
+        }
+
+        .social-link.dingtalk {
+            background: #1678f3;
+            border-color: #1678f3;
+            cursor: pointer;
+        }
+
+        .social-link.dingtalk:hover {
+            border-color: #3b9cff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(22, 120, 243, 0.4);
+        }
+
+        .social-link.github:hover {
+            border-color: #333;
+        }
+
+        /* QR Code Modal */
+        .qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .qr-modal.active {
+            display: flex;
+        }
+
+        .qr-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .qr-modal-content h3 {
+            color: #1678f3;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .qr-modal-content img {
+            max-width: 280px;
+            border-radius: 12px;
+            border: 2px solid #eee;
+        }
+
+        .qr-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .qr-modal-close:hover {
+            color: #333;
+        }
+
+        .cta h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .cta p {
+            color: var(--text-gray);
+            margin-bottom: 2.5rem;
+            font-size: 1.15rem;
+            position: relative;
+        }
+
+        /* Footer */
+        /* 浮動客服側邊欄 */
+        .floating-contact {
+            position: fixed;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 999;
+        }
+
+        .fc-item {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            background: transparent;
+            margin-left: auto;
+        }
+
+        .fc-item.login, .fc-item.register {
+            width: auto;
+            height: auto;
+            padding: 10px 16px;
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-left: 0;
+        }
+
+        .fc-item.register {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .fc-item.login:hover, .fc-item.register:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .fc-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .fc-item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .floating-contact {
+                right: 5px;
+                gap: 8px;
+            }
+            .fc-item {
+                width: 50px;
+                height: 50px;
+                border-radius: 10px;
+            }
+            .fc-item img {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        footer {
+            padding: 3rem 5%;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(10, 22, 40, 0.5);
+        }
+
+        .footer-logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #ffffff;
+        }
+
+        footer p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Menu */
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1001;
+        }
+
+        .mobile-toggle span {
+            width: 25px;
+            height: 2px;
+            background: var(--text-light);
+            transition: all 0.3s;
+        }
+
+        .mobile-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .mobile-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 22, 40, 0.98);
+            z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            overflow-y: auto;
+            padding: 80px 20px;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        .mobile-menu a:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            * {
+                max-width: 100vw;
+            }
+
+            html, body {
+                overflow-x: hidden;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .hero {
+                padding: 100px 5% 60px;
+                min-height: auto;
+                min-height: 100vh;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            section {
+                padding: 60px 5%;
+                max-width: 100vw;
+                overflow-x: hidden;
+            }
+
+            .risk-header,
+            .risk-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .risk-header span:not(:first-child),
+            .risk-row > div:not(:first-child) {
+                display: none;
+            }
+
+            .risk-group {
+                justify-content: flex-start;
+            }
+
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .container, .strategy-content, .services-grid, .pricing-cards, .profit-grid, .team-grid, .faq-list, .contact-container {
+                max-width: 100%;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <nav id="navbar">
+        <div class="logo">
+            <img src="logo.jpg" alt="MTCFX Capital">
+            <div class="logo-text-wrapper">
+                <span class="logo-text">MTCFX</span>
+                <span class="logo-subtext">專業量化交易服務商</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#strategy">關於我們</a></li>
+            <li><a href="#services">MTCFX會員</a></li>
+            <li><a href="#pricing">月費方案</a></li>
+            <li><a href="#profitsharing">分潤制</a></li>
+            <li><a href="#team">託管方案</a></li>
+            <li><a href="#team">追蹤每日收益</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#contact">聯絡客服</a></li>
+            <li><a href="https://portal.tmgm.com/login" target="_blank" class="nav-login">登入</a></li>
+            <li><a href="https://portal.tmgm.com/register?node=MjI3MTI4&language=zh-Hant" target="_blank" class="nav-register">註冊</a></li>
+        </ul>
+        <div class="mobile-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <a href="#strategy" class="mobile-link">關於我們</a>
+        <a href="#services" class="mobile-link">MTCFX會員</a>
+        <a href="#pricing" class="mobile-link">月費方案</a>
+        <a href="#profitsharing" class="mobile-link">分潤制</a>
+        <a href="#team" class="mobile-link">託管方案</a>
+        <a href="#risk" class="mobile-link">每日收益</a>
+        <a href="#faq" class="mobile-link">FAQ</a>
+        <a href="#contact" class="mobile-link">聯絡客服</a>
+        <a href="https://portal.tmgm.com/login" class="mobile-link" target="_blank">登入</a>
+        <a href="https://portal.tmgm.com/register?node=MjI3MTI4&language=zh-Hant" class="mobile-link" target="_blank">註冊</a>
+    </div>
+
+    <section class="hero">
+        <div style="width: 100%; text-align: center; margin-bottom: 2rem;">
+            <a href="https://t.me/mtcfxcom" class="btn btn-primary" target="_blank">免費加入MTCFX交易社區</a>
+        </div>
+        <div class="promo-hero-container">
+            <a href="mtcfx.html" class="promo-hero-card" target="_blank">
+                <div class="promo-hero-icon">📈</div>
+                <div class="promo-hero-text">
+                    <span class="promo-hero-title">MTCFX【會員群組】戰績</span>
+                    <span class="promo-hero-desc">點擊查看詳盡交易紀錄與驗證數據 →</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- 聯絡客服 - 移動到策略介紹前面 -->
+    <section class="cta" id="contact">
+        <h2>聯絡客服💁‍♂️</h2>
+        <p>與MTCFX專業團隊一起,探索資本增長的無限可能</p>
+        <div class="social-links" style="margin-top: 2rem;">
+            <a href="https://t.me/mtcgroup1" class="social-link telegram">
+                <span>📱</span> Telegram 客服
+            </a>
+            <a href="https://line.me/ti/p/M8gQQRn3qz" class="social-link line">
+                <span>💬</span> LINE客服
+            </a>
+        </div>
+    </section>
+
+    <section class="strategy" id="strategy">
+        <div class="section-header">
+            <span class="section-label">ABOUT US</span>
+            <h2 class="section-title">關於我們</h2>
+        </div>
+
+        <div class="strategy-intro">
+            <p>MTCFX 是一家國際金融服務提供商,主要從事提供外匯、美股、加密貨幣等市場咨詢服務及託管服務。<br>
+            提供的服務主要包括:<br>
+            (一)MTCFX會員群組服務;<br>
+            (二)MTCFX託管服務。</p>
+        </div>
+
+        <div class="strategy-grid">
+            <div class="strategy-card">
+                <span class="strategy-number">01</span>
+                <div class="strategy-icon">🔬</div>
+                <h3>研究假設</h3>
+                <p>透過深入的市場研究與數據分析,建立投資假設並驗證其可行性</p>
+            </div>
+
+            <div class="strategy-card">
+                <span class="strategy-number">02</span>
+                <div class="strategy-icon">📈</div>
+                <h3>建模回測</h3>
+                <p>運用先進的量化模型進行歷史回測,驗證策略穩定性</p>
+            </div>
+
+            <div class="strategy-card">
+                <span class="strategy-number">03</span>
+                <div class="strategy-icon">🎯</div>
+                <h3>部署監控</h3>
+                <p>自動化執行交易策略,實時監控市場動向</p>
+            </div>
+
+            <div class="strategy-card">
+                <span class="strategy-number">04</span>
+                <div class="strategy-icon">🔄</div>
+                <h3>優化迭代</h3>
+                <p>持續優化策略參數,適應市場變化</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="services" id="services">
+        <div class="section-header">
+            <span class="section-label">MEMBER GROUP</span>
+            <h2 class="section-title">MTCFX會員群組(月費制/分潤制)</h2>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">🛡️</div>
+                <h3>全程化風控</h3>
+                <p>風險量化管理,嚴格止損機制<br>全方位保障投資資金安全</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">📈</div>
+                <h3>跟單交易</h3>
+                <p>專業團隊操盤,會員同步跟單<br>共享優質投資成果</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">💰</div>
+                <h3>倉位配置</h3>
+                <p>根據風險承受能力<br>提供個性化倉位配置方案</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">⚡</div>
+                <h3>即時交易</h3>
+                <p>每日多個交易時段<br>緊密追蹤市場機會</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 月費制會員方案 -->
+    <section class="pricing-section" id="pricing">
+        <div class="section-header">
+            <span class="section-label">SUBSCRIPTION PLANS</span>
+            <h2 class="section-title">🚀 MTCFX會員群組自主下單・月費制 🚀</h2>
+        </div>
+
+        <div class="pricing-content">
+            <div class="signal-times">
+                <h3>🎯 每日策略發佈時間</h3>
+                <div class="time-grid">
+                    <div class="time-item">
+                        <span class="time-label">早盤</span>
+                        <span class="time-value">10:00</span>
+                    </div>
+                    <div class="time-item">
+                        <span class="time-label">實時</span>
+                        <span class="time-value">15:00</span>
+                    </div>
+                    <div class="time-item">
+                        <span class="time-label">午盤</span>
+                        <span class="time-value">17:00</span>
+                    </div>
+                </div>
+                <p class="lot-size">📌 建議手數：每1萬美元帳號下單0.5手</p>
+            </div>
+
+            <div class="pricing-plans">
+                <h3>✨ 靈活月費制 - 套餐選擇</h3>
+                <div class="plans-grid">
+                    <div class="plan-card">
+                        <span class="plan-period">3個月</span>
+                        <span class="plan-price">$388 USDT</span>
+                    </div>
+                    <div class="plan-card">
+                        <span class="plan-period">6個月</span>
+                        <span class="plan-price">$688 USDT</span>
+                    </div>
+                    <div class="plan-card featured">
+                        <span class="plan-period">12個月</span>
+                        <span class="plan-price">$998 USDT</span>
+                        <span class="plan-badge">最優惠</span>
+                    </div>
+                </div>
+                <p class="payment-method">🤝 付款方式:轉數快 或 USDT</p>
+            </div>
+
+            <div class="benefits">
+                <h3>💡 小資金也能跟上操作,收益輕鬆覆蓋成本!</h3>
+            </div>
+
+            <div class="social-platforms">
+                <h3>📢 官方發佈平台</h3>
+                <div class="platforms">
+                    <div class="platform">
+                        <span class="platform-icon">🔹</span>
+                        <span>Telegram 群組</span>
+                    </div>
+                    <div class="platform">
+                        <span class="platform-icon">🔹</span>
+                        <span>Line 社群</span>
+                    </div>
+                </div>
+                <ul class="platform-features">
+                    <li>➔ 即時訊號 + 策略解析</li>
+                    <li>➔ 互動教學 + 專屬客服</li>
+                </ul>
+                <p class="cta-text">👆 選擇適合你的入群方式,加入群組,接收每日最新資訊及交易策略,助你的帳戶起飛 🚀</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 分潤制會員方案 -->
+    <section class="profit-sharing" id="profitsharing">
+        <div class="section-header">
+            <span class="section-label">PROFIT SHARING</span>
+            <h2 class="section-title">MTCFX會員群組自動跟單·分潤制</h2>
+        </div>
+
+        <div class="ps-content">
+            <div class="ps-highlight">
+                <h3>💰 穩定的收益表現</h3>
+                <p>由一班具10年以上實戰經驗的老師團隊負責策略,過去17個月僅3個月虧損。</p>
+            </div>
+
+            <div class="ps-schedule">
+                <h3>🎯 每日策略發佈時間</h3>
+                <div class="time-grid">
+                    <div class="time-item">
+                        <span class="time-label">早盤</span>
+                        <span class="time-value">10:00</span>
+                    </div>
+                    <div class="time-item">
+                        <span class="time-label">實時</span>
+                        <span class="time-value">15:00</span>
+                    </div>
+                    <div class="time-item">
+                        <span class="time-label">午盤</span>
+                        <span class="time-value">17:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ps-risk">
+                <h3>🔰 風險的可控性</h3>
+                <p>每單都帶有止盈止損,盈虧比約2:1。</p>
+            </div>
+
+            <div class="ps-groups">
+                <h3>⚖️ 跟單組別選擇</h3>
+                <p class="groups-note">每10000美元淨值下單手數:</p>
+                <div class="groups-grid">
+                    <div class="group-card">
+                        <span class="group-icon">🛡️</span>
+                        <span class="group-name">保守組</span>
+                        <span class="group-lots">0.5手</span>
+                    </div>
+                    <div class="group-card">
+                        <span class="group-icon">📊</span>
+                        <span class="group-name">標準組</span>
+                        <span class="group-lots">1手</span>
+                    </div>
+                    <div class="group-card featured">
+                        <span class="group-icon">🚀</span>
+                        <span class="group-name">進取組</span>
+                        <span class="group-lots">2手</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ps-diversity">
+                <h3>📈 策略多樣性</h3>
+                <p>多元化產品:黃金,外匯,美股等市場,捕捉更多有利可圖的機會!</p>
+            </div>
+
+            <div class="ps-flexibility">
+                <h3>♻️ 資金靈活運用</h3>
+                <p>客戶隨時可以加碼或取消綁定出金。</p>
+            </div>
+
+            <div class="ps-flow">
+                <h3>託管自動跟單流程:</h3>
+                <ol class="flow-steps">
+                    <li><span class="step-num">1</span> 經專屬鏈接開戶入金<br><a href="https://portal.tmgm.com/register?node=MjI3MTI4&language=zh-Hant" target="_blank" class="flow-link">https://portal.tmgm.com/register?node=MjI3MTI4&language=zh-Hant</a></li>
+                    <li><span class="step-num">2</span> 入金成功後,收到邀請加入自動跟單,確認後會開出9開頭的跟單子帳號,再內轉資金到此子帳號。</li>
+                    <li><span class="step-num">3</span> 跟單綁定成功,與主帳戶同步運作。<strong>無需提供交易帳密!</strong></li>
+                    <li><span class="step-num">4</span> 每月1號會經官方自動扣除20%盈利部分。</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <section class="team" id="team">
+        <div class="section-header">
+            <span class="section-label">託管方案</span>
+            <h2 class="section-title">MTCFX菁英組託管方案</h2>
+        </div>
+
+        <div class="elite-features">
+            <div class="elite-grid">
+                <div class="elite-item">
+                    <span class="elite-icon">💵</span>
+                    <span class="elite-label">資金門檻</span>
+                    <span class="elite-value">20,000美元起</span>
+                </div>
+                <div class="elite-item">
+                    <span class="elite-icon">📊</span>
+                    <span class="elite-label">交易品種</span>
+                    <span class="elite-value">黃金 / 原油 / 外匯 / 股票 / 加密貨幣</span>
+                </div>
+                <div class="elite-item">
+                    <span class="elite-icon">🔄</span>
+                    <span class="elite-label">運作機制</span>
+                    <span class="elite-value">每日20%資金運作</span>
+                </div>
+                <div class="elite-item">
+                    <span class="elite-icon">📈</span>
+                    <span class="elite-label">績效分潤</span>
+                    <span class="elite-value">20%(月結)</span>
+                </div>
+            </div>
+            <div class="elite-performance">
+                <span class="performance-label">📈 過往績效:</span>
+                <span class="performance-value">過去21個月增長792.13%</span>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <span class="section-label">DAILY RETURNS</span>
+            <h2 class="section-title">追蹤每日收益(<a href="https://t.me/mtcfxcom" target="_blank" style="color: var(--accent); text-decoration: none;">免費交易社區</a>)</h2>
+            <p style="color: var(--text-gray); margin-top: 1rem;">※ 按每萬美元帳戶淨值計算</p>
+        </div>
+    </section>
+
+    <section class="faq-section" id="faq">
+        <div class="section-header">
+            <span class="section-label">FAQ</span>
+            <h2 class="section-title">常見問題</h2>
+        </div>
+
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3>❓ 你們是什麼機構?</h3>
+                <p>MTCFX 是一家專業的量化投資機構,專注於黃金和外匯市場的算法交易。我們擁有多年經驗的專業交易團隊,為投資者提供穩定的投資回報。</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>💰 最低投資額是多少?</h3>
+                <p>我們建議每1萬美元帳戶下單0.5手起。具體倉位可根據您的風險承受能力進行調整。</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>📊 服務費用如何?</h3>
+                <p>3個月$388 USDT,6個月$688 USDT,12個月$998 USDT。費用包含每日策略、信號指導及專業客服。</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>🔒 資金安全嗎?</h3>
+                <p>我們採用全程化風控系統,嚴格止損機制,保護投資者資金安全。所有交易公開透明,會員可即時查看。</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>📱 如何開始?</h3>
+                <p>只需聯繫客服,選擇適合您的會員套餐,完成付款後即可加入會員群組,開始接收每日交易策略。</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>⏰ 交易時間?</h3>
+                <p>我們每日發佈策略：早盤10：00、實時15：00、午盤17：00。覆蓋全球主要市場交易時段。</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-logo">MTCFX</div>
+        <p>© 2026 MTCFX . All rights reserved.</p>
+    </footer>
+
+    <!-- DingTalk QR Modal -->
+    <div class="qr-modal" id="dingtalk-qr-modal">
+        <div class="qr-modal-content">
+            <span class="qr-modal-close" onclick="closeDingTalkQR()">&times;</span>
+            <h3>🔗 釘釘客服</h3>
+            <img src="dingtalk-Michael.jpg" alt="釘釘客服 QR Code">
+            <p style="margin-top: 15px; color: #666;">請掃描上方二維碼添加客服</p>
+        </div>
+    </div>
+
+    <!-- 浮動客服側邊欄 -->
+    <div class="floating-contact">
+        <a href="https://portal.tmgm.com/login" class="fc-item login" target="_blank" title="登入">
+            <span>登入</span>
+        </a>
+        <a href="https://portal.tmgm.com/register?node=MjI3MTI4&language=zh-Hant" class="fc-item register" target="_blank" title="註冊">
+            <span>註冊</span>
+        </a>
+        <a href="https://t.me/mtcgroup1" class="fc-item telegram" target="_blank" title="Telegram">
+            <img src="emoji-telegram2.jpg" alt="Telegram">
+        </a>
+        <a href="https://line.me/ti/p/M8gQQRn3qz" class="fc-item line" target="_blank" title="LINE-Nick">
+            <img src="LINE.jpg" alt="LINE">
+        </a>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const mobileToggle = document.querySelector('.mobile-toggle');
+        const mobileMenu = document.querySelector('.mobile-menu');
+
+        mobileToggle.addEventListener('click', function() {
+            mobileToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', function() {
+                mobileToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // DingTalk QR Modal Functions
+        function showDingTalkQR() {
+            document.getElementById('dingtalk-qr-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDingTalkQR() {
+            document.getElementById('dingtalk-qr-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('dingtalk-qr-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDingTalkQR();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDingTalkQR();
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
