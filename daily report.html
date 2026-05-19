@@ -69,7 +69,7 @@
             min-width: 40px;
         }
 
-        .control-group input {
+        .control-group input, .control-group select {
             padding: 10px 15px;
             border-radius: 6px;
             border: 1px solid rgba(0, 102, 204, 0.5);
@@ -80,7 +80,7 @@
             cursor: pointer;
         }
 
-        .control-group input:focus {
+        .control-group input:focus, .control-group select:focus {
             outline: none;
             border-color: #0066cc;
             background: rgba(0, 102, 204, 0.2);
@@ -420,11 +420,26 @@
         <div class="controls">
             <div class="control-group">
                 <label>年份:</label>
-                <input type="number" id="yearInput" min="2024" max="2099" value="2026">
+                <select id="yearInput" onchange="loadCalendar()" style="padding: 10px 15px; border-radius: 6px; border: 1px solid rgba(0, 102, 204, 0.5); background: rgba(0, 102, 204, 0.1); color: #ffffff; font-size: 1em; cursor: pointer;">
+                    <!-- 年份選項由 JavaScript 動態生成 -->
+                </select>
             </div>
             <div class="control-group">
                 <label>月份:</label>
-                <input type="number" id="monthInput" min="1" max="12" value="5">
+                <select id="monthInput" onchange="loadCalendar()" style="padding: 10px 15px; border-radius: 6px; border: 1px solid rgba(0, 102, 204, 0.5); background: rgba(0, 102, 204, 0.1); color: #ffffff; font-size: 1em; cursor: pointer;">
+                    <option value="1">一月</option>
+                    <option value="2">二月</option>
+                    <option value="3">三月</option>
+                    <option value="4">四月</option>
+                    <option value="5">五月</option>
+                    <option value="6">六月</option>
+                    <option value="7">七月</option>
+                    <option value="8">八月</option>
+                    <option value="9">九月</option>
+                    <option value="10">十月</option>
+                    <option value="11">十一月</option>
+                    <option value="12">十二月</option>
+                </select>
             </div>
             <div class="button-group">
                 <button class="btn-secondary" onclick="goToToday()">📅 今天</button>
@@ -493,6 +508,35 @@
     </div>
 
     <script>
+        // 初始化年份選擇器
+        function initYearSelect() {
+            const yearSelect = document.getElementById('yearInput');
+            const currentYear = new Date().getFullYear();
+            
+            for (let year = 2024; year <= 2099; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year + '年';
+                if (year === currentYear) {
+                    option.selected = true;
+                }
+                yearSelect.appendChild(option);
+            }
+        }
+
+        // 初始化月份選擇器
+        function initMonthSelect() {
+            const monthSelect = document.getElementById('monthInput');
+            const currentMonth = new Date().getMonth() + 1;
+            monthSelect.value = currentMonth;
+        }
+
+        // 頁面加載時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initYearSelect();
+            initMonthSelect();
+            loadCalendar();
+        });
         // 模擬數據 - 可替換為實際 API 數據
         const dailyProfitData = {
             '2024-12-02': 1000.00,
