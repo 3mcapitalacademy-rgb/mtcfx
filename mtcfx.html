@@ -616,12 +616,12 @@
             <!-- 2026 -->
             <div class="year-section">
                 <div class="year-header">
-                    <span class="year-title">📅 2026年 (運營4個月)</span>
-                    <span class="year-total positive">+$19,501</span>
+                    <span class="year-title">📅 2026年 (運營5個月)</span>
+                    <span class="year-total positive">+$25,390</span>
                 </div>
                 <div class="year-stats">
                     <div class="year-stat">
-                        <div class="year-stat-value positive">2</div>
+                        <div class="year-stat-value positive">3</div>
                         <div class="year-stat-label">盈利月</div>
                     </div>
                     <div class="year-stat">
@@ -629,11 +629,11 @@
                         <div class="year-stat-label">虧損月</div>
                     </div>
                     <div class="year-stat">
-                        <div class="year-stat-value">50%</div>
+                        <div class="year-stat-value">60%</div>
                         <div class="year-stat-label">勝率</div>
                     </div>
                     <div class="year-stat">
-                        <div class="year-stat-value">待觀察</div>
+                        <div class="year-stat-value positive">恢復中</div>
                         <div class="year-stat-label">評價</div>
                     </div>
                 </div>
@@ -642,6 +642,7 @@
                     <div class="mini-bar negative" style="height: 13%"><span class="tooltip">2月 -$2,167</span></div>
                     <div class="mini-bar positive" style="height: 27%"><span class="tooltip">3月 +$4,727</span></div>
                     <div class="mini-bar positive" style="height: 100%"><span class="tooltip">4月 +$17,209</span></div>
+                    <div class="mini-bar positive" style="height: 34%"><span class="tooltip">5月 +$5,889</span></div>
                 </div>
             </div>
             
@@ -675,10 +676,10 @@
                         </tr>
                         <tr>
                             <td>2026</td>
-                            <td>4個月</td>
-                            <td style="color: var(--positive)">+$19,501</td>
-                            <td>50%</td>
-                            <td>待觀察</td>
+                            <td>5個月</td>
+                            <td style="color: var(--positive)">+$25,390</td>
+                            <td>60%</td>
+                            <td>恢復中</td>
                         </tr>
                     </tbody>
                 </table>
@@ -737,13 +738,13 @@
     
     <div class="footer">
         <p>⚠️ 投資有風險，過往表現不代表未來收益</p>
-        <p>資料來源：MTCFX · 更新：2026年5月5日</p>
+        <p>資料來源：MTCFX · 更新：2026年6月1日</p>
     </div>
 
     <script>
         // Data
-        const data = [8200,-630,8330,2205,4745,3747,6395,4444,3060,3980,13840,2410,5630,-268,-2167,4727,17209];
-        const labels = ['24/12','25/1','2','3','4','5','6','7','8','9','10','11','12','26/1','2','3','4'];
+        const data = [8200,-630,8330,2205,4745,3747,6395,4444,3060,3980,13840,2410,5630,-268,-2167,4727,17209,5889];
+        const labels = ['24/12','25/1','2','3','4','5','6','7','8','9','10','11','12','26/1','2','3','4','5'];
         
         let cum = 10000, cumData = [cum];
         data.forEach(v => { cum += v; cumData.push(cum); });
